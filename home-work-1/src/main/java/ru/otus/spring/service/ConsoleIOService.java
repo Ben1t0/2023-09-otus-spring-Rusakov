@@ -1,8 +1,8 @@
-package ru.otus.spring.view;
+package ru.otus.spring.service;
 
 import java.util.Scanner;
 
-public class ConsoleQuestionsIO implements QuestionsIO {
+public class ConsoleIOService implements IOService {
     private final Scanner scanner = new Scanner(System.in);
 
     @Override

@@ -1,6 +1,6 @@
-package ru.otus.spring.view;
+package ru.otus.spring.service;
 
-public interface QuestionsIO {
+public interface IOService {
     void printMessage(String message);
 
     String getInput();

@@ -34,11 +34,8 @@ public class Question {
         return Collections.unmodifiableSet(answers);
     }
 
-
     public void addAnswer(Answer a) {
-        if (a.questionId().equals(this.id)) {
-            answers.add(a);
-        }
+        answers.add(a);
     }
 
     @Override
@@ -57,9 +54,4 @@ public class Question {
     public int hashCode() {
         return Objects.hash(id);
     }
-
-    public Question clone() {
-        return new Question(this.id, this.question, this.answers);
-    }
-
 }

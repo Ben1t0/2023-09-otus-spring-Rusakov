@@ -1,4 +1,4 @@
-Question Id, Question
-1,What is spring?
-2,What is IoC ?
-3,Can you place dynamic data in context?
+Question, Answer 1, Answer 2,...,Answer N, right answer number
+What is spring?,language, framework, bicycle,2
+What is IoC ?,framework mechanism for dependency control, Imagination of Control,1
+Can you place dynamic data in context?
