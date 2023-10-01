@@ -7,7 +7,7 @@
     </bean>
     <bean id="questionService" class="ru.otus.spring.service.QuestionServiceSimple">
         <constructor-arg name="questionDao" ref="questionDao"/>
-        <constructor-arg name="questionIO" ref="questionIo"/>
+        <constructor-arg name="iOService" ref="ioService"/>
     </bean>
-    <bean id="questionIo" class="ru.otus.spring.service.ConsoleIOService"/>
+    <bean id="ioService" class="ru.otus.spring.service.ConsoleIOService"/>
 </beans>

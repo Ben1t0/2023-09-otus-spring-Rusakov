@@ -9,30 +9,30 @@ import java.util.Set;
 public class QuestionServiceSimple implements QuestionService {
     private final QuestionDao questionDao;
 
-    private final IOService IOService;
+    private final IOService iOService;
 
-    public QuestionServiceSimple(QuestionDao questionDao, IOService questionIO) {
+    public QuestionServiceSimple(QuestionDao questionDao, IOService iOService) {
         this.questionDao = questionDao;
-        this.IOService = questionIO;
+        this.iOService = iOService;
     }
 
     @Override
     public void askAllQuestions() {
         Set<Question> questions = questionDao.getAllQuestions();
         for (Question q : questions) {
-            IOService.printMessage("Question: " + q.getQuestion());
+            iOService.printMessage("Question: " + q.getQuestion());
             if (q.getAnswers().size() > 0) {
-                IOService.printMessage("Select answer: ");
+                iOService.printMessage("Select answer: ");
                 int i = 1;
                 for (Answer a : q.getAnswers()) {
-                    IOService.printMessage(i + " " + a.answer());
+                    iOService.printMessage(i + " " + a.answer());
                     i++;
                 }
             } else {
-                IOService.printMessage("Please enter answer: ");
+                iOService.printMessage("Please enter answer: ");
             }
-            IOService.printMessage("%input from user%");
-            IOService.printMessage("-----");
+            iOService.printMessage("%input from user%");
+            iOService.printMessage("-----");
         }
     }
 }
