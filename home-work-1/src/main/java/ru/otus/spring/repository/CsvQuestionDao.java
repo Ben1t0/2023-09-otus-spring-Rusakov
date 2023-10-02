@@ -22,11 +22,11 @@ public class CsvQuestionDao implements QuestionDao {
 
     @Override
     public Set<Question> getAllQuestions() {
-        InputStream is = getFileFromResourceAsStream(fileName);
         Set<Question> questions = new HashSet<>();
         int id = 1;
 
-        try (InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+        try (InputStream is = getFileFromResourceAsStream(fileName);
+             InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(streamReader)) {
 
             String line;
@@ -48,17 +48,12 @@ public class CsvQuestionDao implements QuestionDao {
     }
 
     private InputStream getFileFromResourceAsStream(String fileName) {
-        try {
-            ClassLoader classLoader = getClass().getClassLoader();
-            InputStream inputStream = classLoader.getResourceAsStream(fileName);
-
-            if (inputStream == null) {
-                throw new QuestionReadException(String.format("File %s not found!", fileName));
-            } else {
-                return inputStream;
-            }
-        } catch (Exception e) {
-            throw new QuestionReadException("Question repository read error", e);
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+        if (inputStream == null) {
+            throw new QuestionReadException(String.format("File %s not found!", fileName));
+        } else {
+            return inputStream;
         }
     }
 }

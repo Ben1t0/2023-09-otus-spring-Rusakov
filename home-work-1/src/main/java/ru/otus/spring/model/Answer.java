@@ -1,4 +1,4 @@
 package ru.otus.spring.model;
 
-public record Answer(String answer, Boolean isCorrect) {
+public record Answer(String answer, boolean isCorrect) {
 }
