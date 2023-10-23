@@ -24,7 +24,7 @@ public class CsvQuestionDao implements QuestionDao {
     }
 
     @Override
-    public Set<Question> getAllQuestions() {
+    public Set<Question> getAllQuestions() throws QuestionReadException {
         Set<Question> questions = new HashSet<>();
         int id = 1;
 
@@ -58,7 +58,7 @@ public class CsvQuestionDao implements QuestionDao {
     }
 
 
-    private InputStream getFileFromResourceAsStream(String fileName) {
+    private InputStream getFileFromResourceAsStream(String fileName) throws QuestionReadException {
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(fileName);
         if (inputStream == null) {

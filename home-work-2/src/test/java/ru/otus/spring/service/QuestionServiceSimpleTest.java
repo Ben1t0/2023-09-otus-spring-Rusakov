@@ -42,12 +42,15 @@ class QuestionServiceSimpleTest {
         when(io.getInput("Please, enter your last name")).thenReturn(studentLastName);
         when(io.getInput("Select answer: ")).thenReturn("1");
 
-        QuestionService qs = new QuestionServiceSimple(questionDao, io, countToPass);
+        StudentService studentService = new StudentServiceSimple(io);
+        ResultsService resultsService = new ResultsServiceSimple(io, countToPass);
+
+        QuestionService qs = new QuestionServiceSimple(questionDao, io, studentService, resultsService, countToPass);
 
         qs.startTesting();
 
         verify(io, times(1))
                 .printMessage(String.format("Dear, %s %s, you PASS the test. (%d correct answer(s) of %d)",
-                studentFirstName, studentLastName, rightAnswersCount, questionsCount));
+                        studentFirstName, studentLastName, rightAnswersCount, questionsCount));
     }
 }
