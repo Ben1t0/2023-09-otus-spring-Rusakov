@@ -18,7 +18,8 @@ public class ResultsServiceSimple implements ResultsService {
     @Value("${app.questions.locale}")
     private Locale locale;
 
-    public ResultsServiceSimple(IOService ioService, MessageSource messageSource, @Value("${app.questions.countToPass}") int countToPass) {
+    public ResultsServiceSimple(IOService ioService, MessageSource messageSource,
+                                @Value("${app.questions.countToPass}") int countToPass) {
         this.ioService = ioService;
         this.messageSource = messageSource;
         this.answerCountToPass = countToPass;
