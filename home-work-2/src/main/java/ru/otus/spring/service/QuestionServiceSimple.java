@@ -7,7 +7,7 @@ import ru.otus.spring.model.Student;
 import ru.otus.spring.model.TestResult;
 import ru.otus.spring.repository.QuestionDao;
 
-import java.util.Set;
+import java.util.List;
 
 @Service
 public class QuestionServiceSimple implements QuestionService {
@@ -35,7 +35,7 @@ public class QuestionServiceSimple implements QuestionService {
     public void startTesting() {
         Student st = studentService.getStudent();
         int rightAnswersCount = 0;
-        Set<Question> questions = questionDao.getAllQuestions();
+        List<Question> questions = questionDao.getAllQuestions();
         if (questions.size() < answerCountToPass) {
             answerCountToPass = questions.size();
         }

@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class CsvQuestionDao implements QuestionDao {
@@ -24,8 +24,8 @@ public class CsvQuestionDao implements QuestionDao {
     }
 
     @Override
-    public Set<Question> getAllQuestions() throws QuestionReadException {
-        Set<Question> questions = new HashSet<>();
+    public List<Question> getAllQuestions() throws QuestionReadException {
+        List<Question> questions = new ArrayList<>();
         int id = 1;
 
         try (InputStream is = getFileFromResourceAsStream(fileName);
