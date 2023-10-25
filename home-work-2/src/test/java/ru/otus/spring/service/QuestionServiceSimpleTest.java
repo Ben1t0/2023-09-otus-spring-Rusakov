@@ -7,7 +7,7 @@ import ru.otus.spring.model.Question;
 import ru.otus.spring.repository.CsvQuestionDao;
 import ru.otus.spring.repository.QuestionDao;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -35,7 +35,7 @@ class QuestionServiceSimpleTest {
         q3.addAnswer(2, new Answer("q3a2", true));
         q3.addAnswer(2, new Answer("q3a3", false));
 
-        Set<Question> questions = Set.of(q1, q2, q3);
+        List<Question> questions = List.of(q1, q2, q3);
 
         when(questionDao.getAllQuestions()).thenReturn(questions);
         when(io.getInput("Please, enter your first name")).thenReturn(studentFirstName);
