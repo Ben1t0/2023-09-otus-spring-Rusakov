@@ -14,6 +14,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>home-work-1</module>
+        <module>home-work-2</module>
         <module>home-work-3</module>
     </modules>
 
