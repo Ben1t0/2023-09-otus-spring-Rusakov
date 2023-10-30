@@ -1,10 +1,12 @@
 package ru.otus.spring.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Repository;
+import ru.otus.spring.config.AppConfig;
+import ru.otus.spring.config.LocaleConfig;
+import ru.otus.spring.config.QuestionFileNameProvider;
 import ru.otus.spring.exception.QuestionReadException;
 import ru.otus.spring.model.Answer;
 import ru.otus.spring.model.Question;
@@ -14,9 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 @Slf4j
@@ -24,21 +25,20 @@ public class CsvQuestionDao implements QuestionDao {
 
     private final String fileName;
 
-
-    public CsvQuestionDao(@Value("${app.questions.source.basename}") String baseName, ResourceLoader resourceLoader,
-                          @Value("${app.questions.locale}") Locale locale) {
-        String localFileName = baseName + "_" + locale.getLanguage() + ".csv";
+    public CsvQuestionDao(ResourceLoader resourceLoader, QuestionFileNameProvider provider, LocaleConfig localeConfig) {
+        String localFileName = provider.getQuestionFileName();
         Resource resource = resourceLoader.getResource("classpath:\\locale\\questions\\" + localFileName);
         if (!resource.exists()) {
-            log.warn("No file for locale " + locale.getLanguage() + ". Switch to default.");
-            localFileName = baseName + "_en.csv";
+            log.warn("No file for locale " + localeConfig.getLocale().getLanguage() + ". Switch to default.");
+            ((AppConfig) localeConfig).setLocale("en-US");
+            localFileName = provider.getQuestionFileName();
         }
         this.fileName = localFileName;
     }
 
     @Override
-    public Set<Question> getAllQuestions() throws QuestionReadException {
-        Set<Question> questions = new HashSet<>();
+    public List<Question> getAll() throws QuestionReadException {
+        List<Question> questions = new ArrayList<>();
         int id = 1;
 
         try (InputStream is = getFileFromResourceAsStream(fileName);

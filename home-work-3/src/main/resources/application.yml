@@ -2,8 +2,9 @@ app:
   questions:
     countToPass: 4
     locale: ru_RU
-    source:
-      basename: questions
+    fileNameByLocaleTag:
+      ru-RU: questions_ru.csv
+      en-US: questions_en.csv
 
 spring:
   messages:

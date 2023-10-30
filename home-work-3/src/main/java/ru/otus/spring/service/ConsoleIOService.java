@@ -14,7 +14,12 @@ public class ConsoleIOService implements IOService {
     }
 
     @Override
-    public String getInput(String message) {
+    public String readString() {
+        return scanner.nextLine();
+    }
+
+    @Override
+    public String readStringWithPrompt(String message) {
         printMessage(message);
         return scanner.nextLine();
     }

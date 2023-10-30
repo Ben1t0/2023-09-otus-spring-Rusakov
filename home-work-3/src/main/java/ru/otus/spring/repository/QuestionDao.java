@@ -3,9 +3,9 @@ package ru.otus.spring.repository;
 import ru.otus.spring.exception.QuestionReadException;
 import ru.otus.spring.model.Question;
 
-import java.util.Set;
+import java.util.List;
 
 public interface QuestionDao {
 
-    Set<Question> getAllQuestions() throws QuestionReadException;
+    List<Question> getAll() throws QuestionReadException;
 }

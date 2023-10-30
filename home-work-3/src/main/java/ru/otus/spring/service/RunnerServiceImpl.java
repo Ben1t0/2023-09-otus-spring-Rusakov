@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class RunnerServiceImpl implements RunnerService {
-
     private final QuestionService questionService;
 
     @Override
