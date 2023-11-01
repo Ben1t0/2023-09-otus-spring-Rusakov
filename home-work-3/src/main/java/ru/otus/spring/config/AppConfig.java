@@ -8,6 +8,8 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "app.questions")
 public class AppConfig implements LocaleConfig, TestConfig, QuestionFileNameProvider {
 
+    private final static String FILE_PATH_PREFIX = "/locale/questions/";
+
     private final int countToPass;
 
     private Locale locale;
@@ -36,6 +38,6 @@ public class AppConfig implements LocaleConfig, TestConfig, QuestionFileNameProv
 
     @Override
     public String getQuestionFileName() {
-        return fileNameByLocaleTag.get(locale.toLanguageTag());
+        return FILE_PATH_PREFIX + fileNameByLocaleTag.get(locale.toLanguageTag());
     }
 }

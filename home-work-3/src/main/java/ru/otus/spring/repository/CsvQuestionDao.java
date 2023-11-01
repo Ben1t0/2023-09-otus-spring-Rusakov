@@ -1,11 +1,7 @@
 package ru.otus.spring.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Repository;
-import ru.otus.spring.config.AppConfig;
-import ru.otus.spring.config.LocaleConfig;
 import ru.otus.spring.config.QuestionFileNameProvider;
 import ru.otus.spring.exception.QuestionReadException;
 import ru.otus.spring.model.Answer;
@@ -22,18 +18,10 @@ import java.util.List;
 @Repository
 @Slf4j
 public class CsvQuestionDao implements QuestionDao {
+    private final QuestionFileNameProvider provider;
 
-    private final String fileName;
-
-    public CsvQuestionDao(ResourceLoader resourceLoader, QuestionFileNameProvider provider, LocaleConfig localeConfig) {
-        String localFileName = provider.getQuestionFileName();
-        Resource resource = resourceLoader.getResource("classpath:\\locale\\questions\\" + localFileName);
-        if (!resource.exists()) {
-            log.warn("No file for locale " + localeConfig.getLocale().getLanguage() + ". Switch to default.");
-            ((AppConfig) localeConfig).setLocale("en-US");
-            localFileName = provider.getQuestionFileName();
-        }
-        this.fileName = localFileName;
+    public CsvQuestionDao(QuestionFileNameProvider provider) {
+        this.provider = provider;
     }
 
     @Override
@@ -41,7 +29,7 @@ public class CsvQuestionDao implements QuestionDao {
         List<Question> questions = new ArrayList<>();
         int id = 1;
 
-        try (InputStream is = getFileFromResourceAsStream(fileName);
+        try (InputStream is = getFileFromResourceAsStream(provider.getQuestionFileName());
              InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(streamReader)) {
 
@@ -72,8 +60,7 @@ public class CsvQuestionDao implements QuestionDao {
 
 
     private InputStream getFileFromResourceAsStream(String fileName) throws QuestionReadException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("\\locale\\questions\\" + fileName);
+        InputStream inputStream = getClass().getResourceAsStream(fileName);
         if (inputStream == null) {
             throw new QuestionReadException(String.format("File %s not found!", fileName));
         } else {
