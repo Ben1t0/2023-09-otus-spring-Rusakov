@@ -1,0 +1,12 @@
+app:
+  questions:
+    countToPass: 4
+    locale: ru_RU
+    fileNameByLocaleTag:
+      ru-RU: questions_ru.csv
+      en-US: questions_en.csv
+
+spring:
+  messages:
+    basename: "locale/appmessages"
+    encoding: "UTF-8"

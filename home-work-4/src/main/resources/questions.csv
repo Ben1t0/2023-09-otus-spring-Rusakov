@@ -1,0 +1,6 @@
+Question, Answer 1, Answer 2,...,Answer N, right answer number
+What is spring?,language, framework, bicycle,2
+What is IoC ?,framework mechanism for dependency control, Imagination of Control,1
+Can you place dynamic data in context?, yes,no,2
+What annotation is used for DAO layer classes?, @Service, @Configuration, @Bean, @Repository,4
+What annotation is used for selection properties file?, @PropertySource, @PropertySauce, @PropertyMouse,1
