@@ -37,7 +37,7 @@ public class QuestionServiceSimple implements QuestionService {
         localizedIOService.printFormattedMessageLocalized("question", question.getQuestion());
 
         for (var answers : question.getAnswers().entrySet()) {
-            ((IOService) localizedIOService).printMessage(answers.getKey() + " " + answers.getValue().answer());
+            localizedIOService.printMessage(answers.getKey() + " " + answers.getValue().answer());
         }
 
         while (true) {

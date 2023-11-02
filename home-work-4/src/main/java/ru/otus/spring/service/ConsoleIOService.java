@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
 
-@Service
+@Service("consoleIo")
 public class ConsoleIOService implements IOService {
     private final Scanner scanner = new Scanner(System.in);
 
