@@ -8,7 +8,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "app.questions")
 public class AppConfig implements LocaleConfig, TestConfig, QuestionFileNameProvider {
 
-    private final static String FILE_PATH_PREFIX = "/locale/questions/";
+    private static final String FILE_PATH_PREFIX = "/locale/questions/";
 
     private final int countToPass;
 
