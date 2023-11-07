@@ -2,6 +2,7 @@ package ru.otus.spring.repositories;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,14 +10,19 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.otus.spring.exceptions.EntityNotFoundException;
+import ru.otus.spring.exceptions.NotFoundException;
 import ru.otus.spring.models.Author;
 import ru.otus.spring.models.Book;
 import ru.otus.spring.models.Genre;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class BookRepositoryJdbc implements BookRepository {
@@ -34,21 +40,21 @@ public class BookRepositoryJdbc implements BookRepository {
     }
 
     @Override
-    public Optional<Book> findById(long id) throws EntityNotFoundException {
+    public Optional<Book> findById(long id) {
         String sql = """
                 SELECT b.id, b.title, b.author_id , a.full_name as author_full_name, bg.genre_id, g.name as genre_name
-                FROM books AS b LEFT JOIN authors AS a ON b.author_id = a.id
+                FROM books AS b JOIN authors AS a ON b.author_id = a.id
                 LEFT JOIN books_genres AS bg ON b.id = bg.book_id
                 LEFT JOIN genres AS g ON g.id = bg.genre_id
                 WHERE b.id = :id""";
 
         Map<String, Object> params = Map.of("id", id);
-        List<Book> books = jdbcNamed.query(sql, params, new BookResultSetExtractor());
+        var book = jdbcNamed.query(sql, params, new BookResultSetExtractor());
 
-        if (books == null || books.size() != 1) {
-            throw new EntityNotFoundException("Book with id " + id + " not found");
+        if (book.isEmpty()) {
+            throw new NotFoundException("Book with id " + id + " not found");
         }
-        return Optional.of(books.get(0));
+        return book;
     }
 
     @Override
@@ -62,20 +68,27 @@ public class BookRepositoryJdbc implements BookRepository {
 
     @Override
     public Book save(Book book) {
-        if (book.getId() == 0) {
+        if (book.getId() == null) {
             return insert(book);
         }
         return update(book);
     }
 
     @Override
-    public void deleteById(long id) throws EntityNotFoundException {
-        Book book = findById(id).get();
+    public void deleteById(long id) {
+        String sql = """
+                BEGIN TRANSACTION;
+                DELETE FROM authors WHERE id IN (SELECT author_id FROM books WHERE id = :id); 
+                DELETE FROM books WHERE id  = :id; 
+                COMMIT;
+                """;
 
-        Map<String, Object> params = Map.of("id", id, "authorId", book.getAuthor().getId());
-        jdbcNamed.update("DELETE FROM books AS b WHERE b.id = :id", params);
-        jdbcNamed.update("DELETE FROM authors AS a WHERE a.id = :authorId", params);
-        removeGenresRelationsFor(book);
+        findById(id).ifPresent(book -> {
+            Map<String, Object> params = Map.of("id", id, "authorId", book.getAuthor().getId());
+            jdbcNamed.update(sql, params);
+            removeGenresRelationsFor(book);
+        });
+
     }
 
     private List<Book> getAllBooksWithoutGenres() {
@@ -127,8 +140,20 @@ public class BookRepositoryJdbc implements BookRepository {
     }
 
     private void batchInsertGenresRelationsFor(Book book) {
-        book.getGenres().forEach(g ->
-                jdbc.update("INSERT INTO books_genres (book_id, genre_id) values (?,?)", book.getId(), g.getId()));
+        jdbc.batchUpdate("INSERT INTO books_genres (book_id, genre_id) values (?,?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                        preparedStatement.setString(1, String.valueOf(book.getId()));
+                        preparedStatement.setString(2, String.valueOf(book.getGenres().get(i).getId()));
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return book.getGenres().size();
+                    }
+                }
+        );
     }
 
     private void removeGenresRelationsFor(Book book) {
@@ -151,17 +176,16 @@ public class BookRepositoryJdbc implements BookRepository {
 
     @SuppressWarnings("ClassCanBeRecord")
     @RequiredArgsConstructor
-    private static class BookResultSetExtractor implements ResultSetExtractor<List<Book>> {
+    private static class BookResultSetExtractor implements ResultSetExtractor<Optional<Book>> {
 
         @Override
-        public List<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
+        public Optional<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
             Map<Long, Book> books = new HashMap<>();
             while (rs.next()) {
                 long id = rs.getLong("id");
                 Book book = books.get(id);
                 if (book == null) {
-                    book = Book.builder()
-                            .id(id)
+                    book = Book.builder().id(id)
                             .title(rs.getString("title"))
                             .author(new Author(rs.getLong("author_id"),
                                     rs.getString("author_full_name")))
@@ -174,7 +198,11 @@ public class BookRepositoryJdbc implements BookRepository {
                             rs.getString("genre_name")));
                 }
             }
-            return books.values().stream().toList();
+            if (books.size() == 0) {
+                return Optional.empty();
+            } else {
+                return books.values().stream().findFirst();
+            }
         }
     }
 

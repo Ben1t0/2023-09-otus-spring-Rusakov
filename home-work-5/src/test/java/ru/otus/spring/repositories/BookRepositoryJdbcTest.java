@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.otus.spring.exceptions.EntityNotFoundException;
+import org.springframework.test.annotation.DirtiesContext;
+import ru.otus.spring.exceptions.NotFoundException;
 import ru.otus.spring.models.Author;
 import ru.otus.spring.models.Book;
 import ru.otus.spring.models.Genre;
@@ -15,20 +16,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @JdbcTest
-@Import({BookRepositoryJdbc.class, GenreRepositoryJdbc.class})
+@Import({BookRepositoryJdbc.class, GenreRepositoryJdbc.class, AuthorRepositoryJdbc.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class BookRepositoryJdbcTest {
 
     @Autowired
-    private BookRepositoryJdbc jdbc;
+    private BookRepositoryJdbc bookRepositoryJdbc;
+
+    @Autowired
+    private AuthorRepositoryJdbc authorRepositoryJdbc;
 
     @Test
     void shouldFindBookById() {
-        var g1 = new Genre(1, "Genre_1");
-        var g2 = new Genre(2, "Genre_2");
-        var a1 = new Author(1, "Author_1");
-        var b1 = new Book(1, "BookTitle_1", a1, List.of(g1, g2));
+        var g1 = new Genre(1L, "Genre_1");
+        var g2 = new Genre(2L, "Genre_2");
+        var a1 = new Author(1L, "Author_1");
+        var b1 = new Book(1L, "BookTitle_1", a1, List.of(g1, g2));
 
-        var response = jdbc.findById(b1.getId()).get();
+        var response = bookRepositoryJdbc.findById(b1.getId()).get();
 
         assertThat(response).isEqualTo(b1);
     }
@@ -46,44 +51,29 @@ class BookRepositoryJdbcTest {
         var a2 = new Author(2, "Author_2");
         var a3 = new Author(3, "Author_3");
 
-        var b1 = new Book(1, "BookTitle_1", a1, List.of(g1, g2));
-        var b2 = new Book(2, "BookTitle_2", a2, List.of(g3, g4));
-        var b3 = new Book(3, "BookTitle_3", a3, List.of(g5, g6));
+        var b1 = new Book(1L, "BookTitle_1", a1, List.of(g1, g2));
+        var b2 = new Book(2L, "BookTitle_2", a2, List.of(g3, g4));
+        var b3 = new Book(3L, "BookTitle_3", a3, List.of(g5, g6));
 
 
-        var response = jdbc.findAll();
+        var response = bookRepositoryJdbc.findAll();
 
         assertThat(response).hasSize(3).containsAll(List.of(b1, b2, b3));
     }
 
-    @Test
-    void shouldDeleteBookById() {
-        var g1 = new Genre(1, "Genre_1");
-        var g2 = new Genre(2, "Genre_2");
-        var a1 = new Author(1, "Author_1");
-        var b1 = new Book(1, "BookTitle_1", a1, List.of(g1, g2));
-
-        var response = jdbc.findById(b1.getId()).get();
-
-        assertThat(response).isEqualTo(b1);
-        jdbc.deleteById(1);
-
-        Exception exception = assertThrows(EntityNotFoundException.class, () -> jdbc.findById(1));
-
-        assertThat(exception.getMessage()).isEqualTo("Book with id 1 not found");
-    }
 
     @Test
     void shouldSaveBook() {
         Genre g4 = new Genre(4, "Genre_4");
         Genre g5 = new Genre(5, "Genre_5");
         Author a2 = new Author(2, "Author_2");
-        Book book = new Book(0, "New Book", a2, List.of(g4, g5));
+        Book book = new Book(null, "New Book", a2, List.of(g4, g5));
 
-        book = jdbc.save(book);
+        book = bookRepositoryJdbc.save(book);
+
         assertThat(book.getId()).isGreaterThan(0);
 
-        var response = jdbc.findById(book.getId()).get();
+        var response = bookRepositoryJdbc.findById(book.getId()).get();
 
         assertThat(response)
                 .isNotNull()
@@ -103,7 +93,7 @@ class BookRepositoryJdbcTest {
         Genre g6 = new Genre(6, "Genre_6");
         Author a2 = new Author(2, "Author_2");
 
-        Book book = jdbc.findById(3).get();
+        Book book = bookRepositoryJdbc.findById(3).get();
 
         assertThat(book)
                 .isNotNull()
@@ -119,9 +109,9 @@ class BookRepositoryJdbcTest {
         book.setAuthor(a2);
         book.setGenres(List.of(g3, g4));
 
-        jdbc.save(book);
+        bookRepositoryJdbc.save(book);
 
-        Book response = jdbc.findById(3).get();
+        Book response = bookRepositoryJdbc.findById(3).get();
 
         assertThat(response)
                 .isNotNull()
@@ -134,4 +124,24 @@ class BookRepositoryJdbcTest {
         assertThat(response.getGenres()).hasSize(2).containsAll(List.of(g3, g4));
     }
 
+
+    @Test
+    void shouldDeleteBookById() {
+        var g1 = new Genre(1, "Genre_1");
+        var g2 = new Genre(2, "Genre_2");
+        var a1 = new Author(1, "Author_1");
+        var b1 = new Book(1L, "BookTitle_1", a1, List.of(g1, g2));
+
+        var response = bookRepositoryJdbc.findById(b1.getId());
+
+        assertThat(response.isPresent()).isTrue();
+        assertThat(response.get()).isEqualTo(b1);
+
+        bookRepositoryJdbc.deleteById(1);
+
+        Exception exception = assertThrows(NotFoundException.class, () -> bookRepositoryJdbc.findById(1));
+        assertThat(authorRepositoryJdbc.findById(1).isEmpty()).isTrue();
+
+        assertThat(exception.getMessage()).isEqualTo("Book with id 1 not found");
+    }
 }

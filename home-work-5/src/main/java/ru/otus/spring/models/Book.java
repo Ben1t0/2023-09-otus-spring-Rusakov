@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class Book {
-    private long id;
+    private Long id;
 
     private String title;
 

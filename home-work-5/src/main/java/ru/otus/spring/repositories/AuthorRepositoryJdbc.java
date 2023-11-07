@@ -32,8 +32,13 @@ public class AuthorRepositoryJdbc implements AuthorRepository {
     @Override
     public Optional<Author> findById(long id) {
         Map<String, Object> params = Map.of("id", id);
-        var author = jdbcNamed.queryForObject("SELECT a.id, a.full_name FROM authors AS a WHERE id = :id",
-                params, new AuthorRowMapper());
+        Author author;
+        try {
+            author = jdbcNamed.queryForObject("SELECT a.id, a.full_name FROM authors AS a WHERE id = :id",
+                    params, new AuthorRowMapper());
+        } catch (Exception e) {
+            return Optional.empty();
+        }
         return author != null ? Optional.of(author) : Optional.empty();
     }
 

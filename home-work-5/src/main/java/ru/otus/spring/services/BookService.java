@@ -1,5 +1,6 @@
 package ru.otus.spring.services;
 
+import ru.otus.spring.dto.BookCreateDto;
 import ru.otus.spring.models.Book;
 
 import java.util.List;
@@ -10,9 +11,9 @@ public interface BookService {
 
     List<Book> findAll();
 
-    Book insert(String title, long authorId, List<Long> genresIds);
+    Book insert(BookCreateDto bookCreateDto);
 
-    Book update(long id, String title, long authorId, List<Long> genresIds);
+    Book update(BookCreateDto bookCreateDto);
 
     void deleteById(long id);
 }

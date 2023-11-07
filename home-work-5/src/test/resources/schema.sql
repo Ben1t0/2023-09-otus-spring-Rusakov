@@ -1,3 +1,8 @@
+drop table books_genres;
+drop table books;
+drop table genres;
+drop table authors;
+
 create table if not exists authors
 (
     id        bigserial,

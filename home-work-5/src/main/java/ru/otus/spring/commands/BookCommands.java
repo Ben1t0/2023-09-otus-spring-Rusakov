@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import ru.otus.spring.converters.BookConverter;
+import ru.otus.spring.dto.BookCreateDto;
 import ru.otus.spring.services.BookService;
 
 import java.util.List;
@@ -31,17 +32,24 @@ public class BookCommands {
                 .orElse("Book with id %d not found".formatted(id));
     }
 
-    //bins aaaaaaaaaaaaa 1 1,6//bins aaaaaaaaaaaaa 1 1,6
     @ShellMethod(value = "Insert book", key = "bins")
     public String insertBook(String title, long authorId, List<Long> genresIds) {
-        var savedBook = bookService.insert(title, authorId, genresIds);
+        var savedBook = bookService.insert(BookCreateDto.builder()
+                .title(title)
+                .authorId(authorId)
+                .genreIds(genresIds)
+                .build());
         return bookConverter.bookToString(savedBook);
     }
 
-    //bupd 4 dfasdfasdfasd 3 2,5
     @ShellMethod(value = "Update book", key = "bupd")
     public String updateBook(long id, String title, long authorId, List<Long> genresIds) {
-        var savedBook = bookService.update(id, title, authorId, genresIds);
+        var savedBook = bookService.update(BookCreateDto.builder()
+                .id(id)
+                .title(title)
+                .authorId(authorId)
+                .genreIds(genresIds)
+                .build());
         return bookConverter.bookToString(savedBook);
     }
 
