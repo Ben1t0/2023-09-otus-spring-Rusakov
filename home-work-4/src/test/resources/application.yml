@@ -5,11 +5,11 @@ app:
     fileNameByLocaleTag:
       ru-RU: questions_ru.csv
       en-US: questions_en.csv
-shell:
-  interactive:
-    enabled: false
+
 spring:
   messages:
     basename: "locale/appmessages"
     encoding: "UTF-8"
-
+  shell:
+    interactive:
+      enabled: false

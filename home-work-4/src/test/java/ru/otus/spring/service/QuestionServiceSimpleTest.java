@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(properties = "spring.shell.interactive.enabled=false")
+@SpringBootTest
 @EnableConfigurationProperties(value = AppConfig.class)
 class QuestionServiceSimpleTest {
 
