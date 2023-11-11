@@ -1,5 +1,6 @@
 package ru.otus.spring.repositories;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -34,12 +36,13 @@ public class AuthorRepositoryJdbc implements AuthorRepository {
         Map<String, Object> params = Map.of("id", id);
         Author author;
         try {
-            author = jdbcNamed.queryForObject("SELECT a.id, a.full_name FROM authors AS a WHERE id = :id",
-                    params, new AuthorRowMapper());
-        } catch (Exception e) {
+            author = Objects.requireNonNull(
+                    jdbcNamed.queryForObject("SELECT a.id, a.full_name FROM authors AS a WHERE id = :id",
+                            params, new AuthorRowMapper()));
+        } catch (IncorrectResultSizeDataAccessException e) {
             return Optional.empty();
         }
-        return author != null ? Optional.of(author) : Optional.empty();
+        return Optional.of(author);
     }
 
     private static class AuthorRowMapper implements RowMapper<Author> {

@@ -8,6 +8,7 @@ import ru.otus.spring.models.Genre;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,11 +24,11 @@ class BookServiceImplTest {
 
         int countBefore = bookService.findAll().size();
 
-        var book = bookService.insert(
+        var book = bookService.create(
                 BookCreateDto.builder()
                         .title("New Book")
                         .authorId(2L)
-                        .genreIds(List.of(2L, 6L))
+                        .genreIds(Set.of(2L, 6L))
                         .build()
         );
 
@@ -56,7 +57,7 @@ class BookServiceImplTest {
                         .id(3L)
                         .title("New Book")
                         .authorId(2L)
-                        .genreIds(List.of(2L, 6L))
+                        .genreIds(Set.of(2L, 6L))
                         .build()
         );
 

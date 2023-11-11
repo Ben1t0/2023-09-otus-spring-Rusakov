@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.otus.spring.converters.AuthorConverter;
 import ru.otus.spring.models.Author;
 
 import java.util.List;
@@ -14,20 +13,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @JdbcTest
-@Import({AuthorRepositoryJdbc.class, AuthorConverter.class})
+@Import({AuthorRepositoryJdbc.class})
 class AuthorRepositoryJdbcTest {
 
     @Autowired
     private AuthorRepositoryJdbc jdbc;
 
-    @Autowired
-    private AuthorConverter converter;
-
     @Test
     void shouldReturnAuthorById() {
         var response = jdbc.findById(1);
         assertFalse(response.isEmpty());
-        assertEquals("Id: 1, FullName: Author_1", converter.authorToString(response.get()));
+        assertEquals("Id: 1, FullName: Author_1", "Id: %d, FullName: %s"
+                .formatted(response.get().getId(), response.get().getFullName()));
     }
 
     @Test

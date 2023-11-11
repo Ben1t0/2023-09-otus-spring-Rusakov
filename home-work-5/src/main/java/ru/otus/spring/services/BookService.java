@@ -11,7 +11,7 @@ public interface BookService {
 
     List<Book> findAll();
 
-    Book insert(BookCreateDto bookCreateDto);
+    Book create(BookCreateDto bookCreateDto);
 
     Book update(BookCreateDto bookCreateDto);
 

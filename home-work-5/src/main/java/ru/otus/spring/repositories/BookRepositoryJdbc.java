@@ -27,16 +27,13 @@ import java.util.Optional;
 @Repository
 public class BookRepositoryJdbc implements BookRepository {
 
-    private final GenreRepository genreRepository;
-
     private final NamedParameterJdbcOperations jdbcNamed;
 
     private final JdbcOperations jdbc;
 
-    public BookRepositoryJdbc(NamedParameterJdbcOperations jdbcNamed, GenreRepository genreRepository) {
+    public BookRepositoryJdbc(NamedParameterJdbcOperations jdbcNamed) {
         this.jdbcNamed = jdbcNamed;
         this.jdbc = jdbcNamed.getJdbcOperations();
-        this.genreRepository = genreRepository;
     }
 
     @Override
@@ -49,20 +46,26 @@ public class BookRepositoryJdbc implements BookRepository {
                 WHERE b.id = :id""";
 
         Map<String, Object> params = Map.of("id", id);
-        var book = jdbcNamed.query(sql, params, new BookResultSetExtractor());
+        List<Book> book = jdbcNamed.query(sql, params, new BookResultSetExtractor());
 
-        if (book.isEmpty()) {
+        if (book == null || book.size() == 0) {
             throw new NotFoundException("Book with id " + id + " not found");
         }
-        return book;
+        return Optional.of(book.get(0));
     }
 
     @Override
     public List<Book> findAll() {
-        var genres = genreRepository.findAll();
-        var relations = getAllGenreRelations();
-        var books = getAllBooksWithoutGenres();
-        mergeBooksInfo(books, genres, relations);
+        String sql = """
+                SELECT b.id, b.title, b.author_id , a.full_name as author_full_name, bg.genre_id, g.name as genre_name
+                FROM books AS b JOIN authors AS a ON b.author_id = a.id
+                LEFT JOIN books_genres AS bg ON b.id = bg.book_id
+                LEFT JOIN genres AS g ON g.id = bg.genre_id""";
+
+        List<Book> books = jdbcNamed.query(sql, new BookResultSetExtractor());
+        if (books == null) {
+            return new ArrayList<>();
+        }
         return books;
     }
 
@@ -77,41 +80,14 @@ public class BookRepositoryJdbc implements BookRepository {
     @Override
     public void deleteById(long id) {
         String sql = """
-                BEGIN TRANSACTION;
-                DELETE FROM authors WHERE id IN (SELECT author_id FROM books WHERE id = :id); 
                 DELETE FROM books WHERE id  = :id; 
-                COMMIT;
                 """;
 
         findById(id).ifPresent(book -> {
-            Map<String, Object> params = Map.of("id", id, "authorId", book.getAuthor().getId());
+            Map<String, Object> params = Map.of("id", id);
             jdbcNamed.update(sql, params);
             removeGenresRelationsFor(book);
         });
-
-    }
-
-    private List<Book> getAllBooksWithoutGenres() {
-        String sql = """
-                SELECT b.id, b.title, b.author_id, a.full_name
-                FROM books AS b LEFT JOIN authors AS a ON b.author_id = a.id 
-                """;
-        return jdbc.query(sql, new BookRepositoryJdbc.BookRowMapper()).stream().toList();
-    }
-
-    private List<BookGenreRelation> getAllGenreRelations() {
-        return jdbc.query("SELECT * FROM books_genres",
-                (rs, i) -> new BookGenreRelation(rs.getLong("book_id"), rs.getLong("genre_id")));
-    }
-
-    private void mergeBooksInfo(List<Book> booksWithoutGenres, List<Genre> genres,
-                                List<BookGenreRelation> relations) {
-        for (Book book : booksWithoutGenres) {
-            book.getGenres().addAll(genres.stream()
-                    .filter(g -> relations.stream()
-                            .anyMatch(r -> r.bookId == book.getId() && r.genreId == g.getId()))
-                    .toList());
-        }
     }
 
     private Book insert(Book book) {
@@ -176,10 +152,10 @@ public class BookRepositoryJdbc implements BookRepository {
 
     @SuppressWarnings("ClassCanBeRecord")
     @RequiredArgsConstructor
-    private static class BookResultSetExtractor implements ResultSetExtractor<Optional<Book>> {
+    private static class BookResultSetExtractor implements ResultSetExtractor<List<Book>> {
 
         @Override
-        public Optional<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
+        public List<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
             Map<Long, Book> books = new HashMap<>();
             while (rs.next()) {
                 long id = rs.getLong("id");
@@ -199,13 +175,10 @@ public class BookRepositoryJdbc implements BookRepository {
                 }
             }
             if (books.size() == 0) {
-                return Optional.empty();
+                return new ArrayList<>();
             } else {
-                return books.values().stream().findFirst();
+                return books.values().stream().toList();
             }
         }
-    }
-
-    private record BookGenreRelation(long bookId, long genreId) {
     }
 }

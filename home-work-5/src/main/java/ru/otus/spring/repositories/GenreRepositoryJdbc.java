@@ -8,6 +8,7 @@ import ru.otus.spring.models.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class GenreRepositoryJdbc implements GenreRepository {
     }
 
     @Override
-    public List<Genre> findAllByIds(List<Long> ids) {
+    public List<Genre> findAllByIds(Collection<Long> ids) {
         Map<String, Object> params = Map.of("id", ids);
         var genre = jdbcNamed.query("SELECT g.id, g.name FROM genres as g WHERE g.id IN (:id)",
                 params, new GenreRepositoryJdbc.GenreRowMapper());

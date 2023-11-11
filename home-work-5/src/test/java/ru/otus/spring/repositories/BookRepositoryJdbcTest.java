@@ -140,7 +140,6 @@ class BookRepositoryJdbcTest {
         bookRepositoryJdbc.deleteById(1);
 
         Exception exception = assertThrows(NotFoundException.class, () -> bookRepositoryJdbc.findById(1));
-        assertThat(authorRepositoryJdbc.findById(1).isEmpty()).isTrue();
 
         assertThat(exception.getMessage()).isEqualTo("Book with id 1 not found");
     }

@@ -7,7 +7,7 @@ import ru.otus.spring.converters.BookConverter;
 import ru.otus.spring.dto.BookCreateDto;
 import ru.otus.spring.services.BookService;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -33,8 +33,8 @@ public class BookCommands {
     }
 
     @ShellMethod(value = "Insert book", key = "bins")
-    public String insertBook(String title, long authorId, List<Long> genresIds) {
-        var savedBook = bookService.insert(BookCreateDto.builder()
+    public String insertBook(String title, long authorId, Set<Long> genresIds) {
+        var savedBook = bookService.create(BookCreateDto.builder()
                 .title(title)
                 .authorId(authorId)
                 .genreIds(genresIds)
@@ -43,7 +43,7 @@ public class BookCommands {
     }
 
     @ShellMethod(value = "Update book", key = "bupd")
-    public String updateBook(long id, String title, long authorId, List<Long> genresIds) {
+    public String updateBook(long id, String title, long authorId, Set<Long> genresIds) {
         var savedBook = bookService.update(BookCreateDto.builder()
                 .id(id)
                 .title(title)
