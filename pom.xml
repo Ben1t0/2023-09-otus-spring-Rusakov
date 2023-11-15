@@ -19,6 +19,7 @@
         <module>home-work-3</module>
         <module>home-work-4</module>
         <module>home-work-5</module>
+        <module>home-work-6</module>
     </modules>
 
     <packaging>pom</packaging>
