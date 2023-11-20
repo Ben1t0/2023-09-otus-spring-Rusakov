@@ -26,3 +26,10 @@ merge into books_genres (book_id, genre_id)
            (2, 4),
            (3, 5),
            (3, 6);
+
+merge into comments (message, book_id)
+    key (message, book_id)
+    values ('Comment_1_for_book_1', 1),
+           ('Comment_2_for_book_1', 1),
+           ('Comment_1_for_book_2', 2),
+           ('Comment_1_for_book_3', 3);

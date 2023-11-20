@@ -21,6 +21,15 @@ create table if not exists books
     FOREIGN KEY (author_id) REFERENCES authors (id) ON DELETE CASCADE
 );
 
+create table if not exists comments
+(
+    id      bigserial,
+    message varchar(255),
+    book_id bigint,
+    primary key (id),
+    FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE
+);
+
 create table if not exists books_genres
 (
     book_id  bigint,

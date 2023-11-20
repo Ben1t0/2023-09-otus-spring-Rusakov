@@ -16,21 +16,22 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({BookRepositoryJpa.class, AuthorRepositoryJpa.class, GenreRepositoryJpa.class})
+@Import({JpaBookRepository.class, JpaAuthorRepository.class, JpaGenreRepository.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class BookRepositoryJpaTest {
+class JpaBookRepositoryTest {
 
     @Autowired
     TestEntityManager em;
 
     @Autowired
-    private BookRepositoryJpa repository;
+    private JpaBookRepository repository;
 
     @Autowired
-    private AuthorRepositoryJpa authorRepository;
+    private JpaAuthorRepository authorRepository;
 
     @Autowired
-    private GenreRepositoryJpa genreRepositoryJpa;
+    private JpaGenreRepository jpaGenreRepository;
+
 
     @Test
     void shouldFindBookById() {
@@ -41,7 +42,7 @@ class BookRepositoryJpaTest {
 
         var response = repository.findById(b1.getId()).get();
 
-        assertThat(response).isEqualTo(b1);
+        assertThat(b1).isEqualTo(response);
     }
 
     @Test
@@ -61,16 +62,15 @@ class BookRepositoryJpaTest {
         var b2 = new Book(2L, "BookTitle_2", a2, List.of(g3, g4));
         var b3 = new Book(3L, "BookTitle_3", a3, List.of(g5, g6));
 
-
         var response = repository.findAll();
 
-        assertThat(response).hasSize(3).containsAll(List.of(b1, b2, b3));
+        assertThat(List.of(b1, b2, b3)).hasSize(3).containsAll(response);
     }
 
 
     @Test
     void shouldSaveBook() {
-        var genres = genreRepositoryJpa.findAllByIds(List.of(4L, 5L));
+        var genres = jpaGenreRepository.findAllByIds(List.of(4L, 5L));
         Author a2 = authorRepository.findById(2L).get();
 
         Book book = new Book(null, "New Book", a2, genres);

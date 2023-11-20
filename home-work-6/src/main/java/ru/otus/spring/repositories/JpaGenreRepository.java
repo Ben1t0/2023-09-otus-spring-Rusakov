@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public class GenreRepositoryJpa implements GenreRepository {
+public class JpaGenreRepository implements GenreRepository {
     @PersistenceContext
     private EntityManager em;
 

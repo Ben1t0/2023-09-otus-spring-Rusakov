@@ -11,11 +11,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({GenreRepositoryJpa.class})
-class GenreRepositoryJpaTest {
+@Import({JpaGenreRepository.class})
+class JpaGenreRepositoryTest {
 
     @Autowired
-    private GenreRepositoryJpa repository;
+    private JpaGenreRepository repository;
 
     @Test
     void shouldReturnAllGenresByIds() {

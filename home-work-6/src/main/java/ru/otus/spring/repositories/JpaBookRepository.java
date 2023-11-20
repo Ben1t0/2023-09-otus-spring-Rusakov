@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class BookRepositoryJpa implements BookRepository {
+public class JpaBookRepository implements BookRepository {
 
     @PersistenceContext
     private EntityManager em;
@@ -29,7 +29,9 @@ public class BookRepositoryJpa implements BookRepository {
 
     @Override
     public List<Book> findAll() {
+        EntityGraph<?> entityGraph = em.getEntityGraph("book-author-graph");
         TypedQuery<Book> query = em.createQuery("select b from Book as b", Book.class);
+        query.setHint("jakarta.persistence.fetchgraph", entityGraph);
         return query.getResultList();
     }
 

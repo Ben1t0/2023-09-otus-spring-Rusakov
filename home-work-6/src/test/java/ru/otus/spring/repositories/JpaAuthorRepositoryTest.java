@@ -13,11 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
-@Import(AuthorRepositoryJpa.class)
-class AuthorRepositoryJpaTest {
+@Import(JpaAuthorRepository.class)
+class JpaAuthorRepositoryTest {
 
     @Autowired
-    private AuthorRepositoryJpa repository;
+    private JpaAuthorRepository repository;
 
     @Test
     void shouldReturnAuthorById() {
