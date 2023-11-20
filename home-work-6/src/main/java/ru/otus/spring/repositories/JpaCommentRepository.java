@@ -17,13 +17,16 @@ public class JpaCommentRepository implements CommentRepository {
 
     @Override
     public Optional<Comment> findById(long commentId) {
-        return Optional.ofNullable(em.find(Comment.class, commentId));
+        TypedQuery<Comment> query = em.createQuery("select c from Comment as c join fetch c.book where c.id = :id",
+                Comment.class);
+        query.setParameter("id", commentId);
+        return Optional.of(query.getSingleResult());
     }
 
     @Override
     public List<Comment> findByBookId(long bookId) {
-        TypedQuery<Comment> query = em.createQuery("select c from Comment as c where c.book.id = :bookId",
-                Comment.class);
+        TypedQuery<Comment> query = em.createQuery("select c from Comment as c join fetch c.book where " +
+                "c.book.id = :bookId", Comment.class);
         query.setParameter("bookId", bookId);
         return query.getResultList();
     }

@@ -33,6 +33,8 @@ class JpaAuthorRepositoryTest {
         Author a1 = new Author(1, "Author_1");
         Author a2 = new Author(2, "Author_2");
         Author a3 = new Author(3, "Author_3");
-        assertThat(response).hasSize(3).containsAll(List.of(a1, a2, a3));
+        assertThat(response).hasSize(3)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsAll(List.of(a1, a2, a3));
     }
 }

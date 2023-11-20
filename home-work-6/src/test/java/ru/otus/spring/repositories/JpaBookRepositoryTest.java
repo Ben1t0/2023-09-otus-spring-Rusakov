@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.otus.spring.models.Author;
 import ru.otus.spring.models.Book;
 import ru.otus.spring.models.Genre;
@@ -16,8 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({JpaBookRepository.class, JpaAuthorRepository.class, JpaGenreRepository.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(JpaBookRepository.class)
 class JpaBookRepositoryTest {
 
     @Autowired
@@ -26,13 +24,6 @@ class JpaBookRepositoryTest {
     @Autowired
     private JpaBookRepository repository;
 
-    @Autowired
-    private JpaAuthorRepository authorRepository;
-
-    @Autowired
-    private JpaGenreRepository jpaGenreRepository;
-
-
     @Test
     void shouldFindBookById() {
         var g1 = new Genre(1L, "Genre_1");
@@ -40,9 +31,9 @@ class JpaBookRepositoryTest {
         var a1 = new Author(1L, "Author_1");
         var b1 = new Book(1L, "BookTitle_1", a1, List.of(g1, g2));
 
-        var response = repository.findById(b1.getId()).get();
+        var response = repository.findById(b1.getId());
 
-        assertThat(b1).isEqualTo(response);
+        assertThat(response).isPresent().get().usingRecursiveComparison().isEqualTo(b1);
     }
 
     @Test
@@ -64,14 +55,18 @@ class JpaBookRepositoryTest {
 
         var response = repository.findAll();
 
-        assertThat(List.of(b1, b2, b3)).hasSize(3).containsAll(response);
+        assertThat(List.of(b1, b2, b3)).hasSize(3)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsAll(response);
     }
 
 
     @Test
     void shouldSaveBook() {
-        var genres = jpaGenreRepository.findAllByIds(List.of(4L, 5L));
-        Author a2 = authorRepository.findById(2L).get();
+        var g4 = em.find(Genre.class, 4L);
+        var g5 = em.find(Genre.class, 5L);
+        var genres = List.of(g4, g5);
+        Author a2 = em.find(Author.class, 2L);
 
         Book book = new Book(null, "New Book", a2, genres);
 
@@ -79,17 +74,19 @@ class JpaBookRepositoryTest {
 
         assertThat(book.getId()).isGreaterThan(0);
 
-        var response = repository.findById(book.getId()).get();
+        var response = repository.findById(book.getId());
 
         assertThat(response)
+                .isPresent()
+                .get()
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("title", "New Book")
                 .extracting("id").isNotNull();
 
-        assertThat(response.getAuthor())
+        assertThat(response.get().getAuthor())
                 .hasFieldOrPropertyWithValue("id", 2L)
                 .hasFieldOrPropertyWithValue("fullName", "Author_2");
-        assertThat(response.getGenres()).hasSize(2).containsAll(genres);
+        assertThat(response.get().getGenres()).hasSize(2).containsAll(genres);
     }
 
     @Test
@@ -100,39 +97,47 @@ class JpaBookRepositoryTest {
         Genre g6 = new Genre(6, "Genre_6");
         Author a2 = new Author(2, "Author_2");
 
-        Book book = repository.findById(3).get();
+        var book = repository.findById(3);
 
         assertThat(book)
+                .isPresent()
+                .get()
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("id", 3L)
                 .hasFieldOrPropertyWithValue("title", "BookTitle_3");
 
-        assertThat(book.getAuthor())
+        assertThat(book.get().getAuthor())
                 .hasFieldOrPropertyWithValue("id", 3L)
                 .hasFieldOrPropertyWithValue("fullName", "Author_3");
-        assertThat(book.getGenres()).hasSize(2).containsAll(List.of(g5, g6));
+        assertThat(book.get().getGenres()).hasSize(2)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsAll(List.of(g5, g6));
 
-        book.setTitle("New Title");
-        book.setAuthor(a2);
+        book.get().setTitle("New Title");
+        book.get().setAuthor(a2);
 
         List<Genre> newGenres = new ArrayList<>();
         newGenres.add(g3);
         newGenres.add(g4);
-        book.setGenres(newGenres);
+        book.get().setGenres(newGenres);
 
-        repository.save(book);
+        repository.save(book.get());
 
-        Book response = repository.findById(3).get();
+        var response = repository.findById(3);
 
         assertThat(response)
+                .isPresent()
+                .get()
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("id", 3L)
                 .hasFieldOrPropertyWithValue("title", "New Title");
 
-        assertThat(response.getAuthor())
+        assertThat(response.get().getAuthor())
                 .hasFieldOrPropertyWithValue("id", 2L)
                 .hasFieldOrPropertyWithValue("fullName", "Author_2");
-        assertThat(response.getGenres()).hasSize(2).containsAll(List.of(g3, g4));
+        assertThat(response.get().getGenres()).hasSize(2)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsAll(List.of(g3, g4));
     }
 
 

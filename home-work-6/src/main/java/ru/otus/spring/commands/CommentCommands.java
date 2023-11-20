@@ -29,4 +29,21 @@ public class CommentCommands {
                 .map(converter::commentToString)
                 .collect(Collectors.joining("\n"));
     }
+
+    @ShellMethod(value = "Insert comment", key = "cins")
+    public String insertComment(long bookId, String message) {
+        var comment = commentService.create(bookId, message);
+        return converter.commentToString(comment);
+    }
+
+    @ShellMethod(value = "Update comment", key = "cupd")
+    public String updateComment(long commentId, String message) {
+        var comment = commentService.update(commentId, message);
+        return converter.commentToString(comment);
+    }
+
+    @ShellMethod(value = "Delete book by id", key = "bdel")
+    public void deleteComment(long id) {
+        commentService.deleteById(id);
+    }
 }

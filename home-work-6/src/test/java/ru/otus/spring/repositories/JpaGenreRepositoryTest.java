@@ -24,7 +24,9 @@ class JpaGenreRepositoryTest {
         Genre g3 = new Genre(3, "Genre_3");
         Genre g5 = new Genre(5, "Genre_5");
 
-        assertThat(response).hasSize(3).containsAll(List.of(g1, g3, g5));
+        assertThat(response).hasSize(3)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsAll(List.of(g1, g3, g5));
     }
 
     @Test
@@ -37,6 +39,8 @@ class JpaGenreRepositoryTest {
         Genre g5 = new Genre(5, "Genre_5");
         Genre g6 = new Genre(6, "Genre_6");
 
-        assertThat(response).hasSize(6).containsAll(List.of(g1, g2, g3, g4, g5, g6));
+        assertThat(response).hasSize(6)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsAll(List.of(g1, g2, g3, g4, g5, g6));
     }
 }
