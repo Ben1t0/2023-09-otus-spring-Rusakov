@@ -11,6 +11,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Override
     @EntityGraph("comment-book-graph")
     Optional<Comment> findById(Long id);
+
     @EntityGraph("comment-book-graph")
     List<Comment> findByBookId(Long bookId);
 }
