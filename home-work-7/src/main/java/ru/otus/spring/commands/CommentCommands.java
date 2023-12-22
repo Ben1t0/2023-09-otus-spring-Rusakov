@@ -18,28 +18,26 @@ public class CommentCommands {
 
     @ShellMethod(value = "Find comment by id", key = "cbid")
     public String findCommentById(long id) {
-        return commentService.findById(id)
-                .map(converter::commentToString)
-                .orElse("Comment with id %d not found".formatted(id));
+        return converter.commentDtoToString(commentService.findById(id));
     }
 
     @ShellMethod(value = "Find comment by id", key = "cbbid")
     public String findCommentsByBookId(long id) {
         return commentService.findByBookId(id).stream()
-                .map(converter::commentToString)
+                .map(converter::commentDtoToString)
                 .collect(Collectors.joining("\n"));
     }
 
     @ShellMethod(value = "Insert comment", key = "cins")
     public String insertComment(long bookId, String message) {
         var comment = commentService.create(bookId, message);
-        return converter.commentToString(comment);
+        return converter.commentDtoToString(comment);
     }
 
     @ShellMethod(value = "Update comment", key = "cupd")
     public String updateComment(long commentId, String message) {
         var comment = commentService.update(commentId, message);
-        return converter.commentToString(comment);
+        return converter.commentDtoToString(comment);
     }
 
     @ShellMethod(value = "Delete book by id", key = "bdel")
