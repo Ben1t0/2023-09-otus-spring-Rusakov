@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books {
+            border: 1px solid steelblue;
+            width: 600px;
+            border-collapse: collapse;
+        }
+
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+
+        h3 {
+            background-image: url("../static/listmark.png");
+            background-repeat: no-repeat;
+            padding: 2px;
+            padding-left: 30px;
+        }
+
+    </style>
+
+    <style type="text/css" th:inline="text">
+        [[h3]]
+        {
+            background-image: url([[@{/listmark.png}]])
+        ;
+            background-repeat: no-repeat
+        ;
+            padding: 2px
+        ;
+            padding-left: 30px
+        ;
+        }
+    </style>
+</head>
+<body>
+
+<h3>All books in our library:</h3>
+
+<a th:href="@{/books/create}" href="create_book.html">Add book</a>
+<br></br>
+<table class="books">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genres</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.id}">1</td>
+        <td th:text="${book.title}">I, Robot</td>
+        <td th:text="${book.author.fullName}">Isaac Asimov</td>
+        <td th:text="${#strings.listJoin(book.genres.![name], ', ')}">Sci-Fi</td>
+        <td>
+            <a class="btn" th:href="@{/books/edit(id=${book.id})}" href="edit_book.html">
+                <button type="button">Edit</button>
+            </a>
+            <!--<a th:href="@{/delete(id=${book.id})}" href="/">Delete</a>-->
+            <form th:action="@{/books/delete(id=${book.id})}" method="post">
+                <button type="submit" class="btn">
+                    Delete
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

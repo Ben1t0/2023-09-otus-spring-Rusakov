@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Create book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        h3 {
+            background-image: url("../static/listmark.png");
+            background-repeat: no-repeat;
+            padding: 2px;
+            padding-left: 30px;
+        }
+
+        .errors {
+            color: red;
+        }
+    </style>
+
+    <style type="text/css" th:inline="text">
+        [[h3]] {
+            background-image: url([[@{/listmark.png}]]);
+            background-repeat: no-repeat;
+            padding: 2px;
+            padding-left: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Book edition -->
+<form id="create-form" action="create_book.html" th:action="@{/books/create}" th:method="post" th:object="${book}">
+    <h3>Book Info:</h3>
+
+
+    <div class="row">
+        <label for="book-title-input">Title:</label>
+        <input id="book-title-input" th:field="*{title}" type="text" value="I, Robot"/>
+        <div class="errors" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Wrong book title error</div>
+    </div>
+
+    <div class="row">
+        <label for="book-author-select">Author:</label>
+        <select id="book-author-select" th:field="*{authorId}">
+            <option th:each="a : ${authorsList}" th:value="${a.id}" th:text="${a.fullName}"/>
+        </select>
+    </div>
+
+    <div class="row">
+        <label for="book-genres-select">Genres:</label>
+        <select id="book-genres-select" th:field="*{genreIds}" multiple="multiple">
+            <option th:each="g : ${genresList}" th:value="${g.id}" th:text="${g.name}"/>
+        </select>
+    </div>
+
+    <div class="row">
+        <button type="submit">Add</button>
+        <a href="list.html" th:href="@{/}">
+            <button type="button">Cancel</button>
+        </a>
+    </div>
+</form>
+
+</body>
+</html>
