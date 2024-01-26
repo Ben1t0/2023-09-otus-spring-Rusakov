@@ -12,7 +12,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @EntityGraph("book-author-genre-graph")
     Optional<Book> findById(Long id);
 
-    @EntityGraph("book-author-genre-graph")
+    @EntityGraph("book-author-graph")
     @Override
     List<Book> findAll();
 }

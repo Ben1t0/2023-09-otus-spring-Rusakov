@@ -1,5 +1,6 @@
 package ru.otus.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,8 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.spring.dto.BookCreateDto;
 import ru.otus.spring.dto.BookDto;
-import ru.otus.spring.exceptions.NotFoundException;
-import ru.otus.spring.mappers.BookMapper;
+import ru.otus.spring.dto.BookUpdateDto;
 import ru.otus.spring.models.Author;
 import ru.otus.spring.models.Genre;
 import ru.otus.spring.services.AuthorService;
@@ -30,11 +30,9 @@ public class BookController {
 
     private final GenreService genreService;
 
-    private final BookMapper mapper;
-
     @GetMapping("/")
     public String listPage(Model model) {
-        List<BookDto> books = bookService.findAll().stream().map(mapper::toDto).toList();
+        List<BookDto> books = bookService.findAll();
         model.addAttribute("books", books);
         return "list";
     }
@@ -51,7 +49,8 @@ public class BookController {
     }
 
     @PostMapping("/books/create")
-    public String createBook(@ModelAttribute("book") BookCreateDto book, BindingResult bindingResult, Model model) {
+    public String createBook(@Valid @ModelAttribute("book") BookCreateDto book, BindingResult bindingResult,
+                             Model model) {
         if (bindingResult.hasErrors()) {
 
             return "create_book";
@@ -64,8 +63,7 @@ public class BookController {
 
     @GetMapping("/books/edit")
     public String editPage(@RequestParam("id") long id, Model model) {
-        BookCreateDto book = mapper.toCreateDto(bookService
-                .findById(id).orElseThrow(() -> new NotFoundException("Book not found")));
+        BookUpdateDto book = bookService.findById(id);
         model.addAttribute("book", book);
         List<Author> authors = authorService.findAll();
         model.addAttribute("authorsList", authors);
@@ -75,7 +73,9 @@ public class BookController {
     }
 
     @PostMapping("/books/edit")
-    public String editBook(@ModelAttribute("book") BookCreateDto book, BindingResult bindingResult, Model model) {
+    public String editBook(@Valid @ModelAttribute("book") BookUpdateDto book, BindingResult bindingResult,
+                           Model model) {
+
         if (bindingResult.hasErrors()) {
             return "edit_book";
         }

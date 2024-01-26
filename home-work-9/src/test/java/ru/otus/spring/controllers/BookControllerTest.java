@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.spring.dto.BookCreateDto;
 import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.BookUpdateDto;
 import ru.otus.spring.mappers.BookMapper;
 import ru.otus.spring.models.Author;
 import ru.otus.spring.models.Book;
@@ -18,8 +19,8 @@ import ru.otus.spring.services.BookService;
 import ru.otus.spring.services.GenreService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -62,10 +63,11 @@ class BookControllerTest {
         var b1 = new Book(1L, "BookTitle_1", a1, List.of(g1, g2));
         var b2 = new Book(2L, "BookTitle_2", a2, List.of(g3, g4));
 
-        List<Book> books = List.of(b1, b2);
-        given(bookService.findAll()).willReturn(books);
 
-        List<BookDto> dtos = books.stream().map(mapper::toDto).toList();
+        List<BookDto> dtos = Stream.of(b1, b2).map(mapper::toDto).toList();
+
+        given(bookService.findAll()).willReturn(dtos);
+
         mvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("list"))
@@ -133,7 +135,9 @@ class BookControllerTest {
 
         var b1 = new Book(1L, "BookTitle_1", a1, List.of(g1, g2));
 
-        given(bookService.findById(1L)).willReturn(Optional.of(b1));
+        var dto = mapper.toUpdateDto(b1);
+
+        given(bookService.findById(1L)).willReturn(dto);
 
         var authors = List.of(a1, a2);
         given(authorService.findAll()).willReturn(authors);
@@ -157,7 +161,7 @@ class BookControllerTest {
 
     @Test
     void shouldEditBook() throws Exception {
-        var bookDto = BookCreateDto.builder()
+        var bookDto = BookUpdateDto.builder()
                 .id(2L)
                 .authorId(3L)
                 .title("new title")
@@ -175,7 +179,7 @@ class BookControllerTest {
                 .andExpect(header().string("Location", "/"));
 
 
-        ArgumentCaptor<BookCreateDto> argument = ArgumentCaptor.forClass(BookCreateDto.class);
+        ArgumentCaptor<BookUpdateDto> argument = ArgumentCaptor.forClass(BookUpdateDto.class);
         verify(bookService, times(1)).update(argument.capture());
         assertThat(argument.getValue())
                 .hasFieldOrPropertyWithValue("id", bookDto.getId())

@@ -11,7 +11,10 @@ import java.util.List;
 
 @Builder
 @Getter
-public class BookCreateDto {
+public class BookUpdateDto {
+    @NotEmpty
+    private Long id;
+
     @Builder.Default
     @NotBlank
     private String title = "";

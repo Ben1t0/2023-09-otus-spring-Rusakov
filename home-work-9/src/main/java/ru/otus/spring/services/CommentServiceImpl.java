@@ -2,7 +2,9 @@ package ru.otus.spring.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.otus.spring.dto.CommentCreateDto;
 import ru.otus.spring.dto.CommentDto;
+import ru.otus.spring.dto.CommentUpdateDto;
 import ru.otus.spring.exceptions.NotFoundException;
 import ru.otus.spring.mappers.CommentMapper;
 import ru.otus.spring.models.Book;
@@ -33,18 +35,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto create(long bookId, String message) {
-        Book book = bookRepository.findById(bookId).orElseThrow(
-                () -> new NotFoundException("book with %d not found".formatted(bookId)));
-        Comment comment = new Comment(null, message, book);
+    public CommentDto create(CommentCreateDto commentCreateDto) {
+        Book book = bookRepository.findById(commentCreateDto.getBookId()).orElseThrow(
+                () -> new NotFoundException("book with %d not found".formatted(commentCreateDto.getBookId())));
+        Comment comment = new Comment(null, commentCreateDto.getMessage(), book);
         return commentMapper.toDto(commentRepository.save(comment));
     }
 
     @Override
-    public CommentDto update(long commentId, String message) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new NotFoundException("Comment with %d not found".formatted(commentId)));
-        comment.setMessage(message);
+    public CommentDto update(CommentUpdateDto commentUpdateDto) {
+        Comment comment = commentRepository.findById(commentUpdateDto.getCommentId()).orElseThrow(
+                () -> new NotFoundException("Comment with %d not found".formatted(commentUpdateDto.getCommentId())));
+        comment.setMessage(commentUpdateDto.getMessage());
         return commentMapper.toDto(commentRepository.save(comment));
     }
 

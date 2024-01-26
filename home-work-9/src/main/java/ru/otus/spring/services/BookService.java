@@ -1,19 +1,19 @@
 package ru.otus.spring.services;
 
 import ru.otus.spring.dto.BookCreateDto;
-import ru.otus.spring.models.Book;
+import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.BookUpdateDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BookService {
-    Optional<Book> findById(long id);
+    BookUpdateDto findById(long id);
 
-    List<Book> findAll();
+    List<BookDto> findAll();
 
-    Book create(BookCreateDto bookCreateDto);
+    BookDto create(BookCreateDto bookCreateDto);
 
-    Book update(BookCreateDto bookCreateDto);
+    BookDto update(BookUpdateDto bookUpdateDto);
 
     void deleteById(long id);
 }
