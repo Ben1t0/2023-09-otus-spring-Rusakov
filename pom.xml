@@ -21,6 +21,7 @@
         <module>home-work-5</module>
         <module>home-work-6</module>
         <module>home-work-7</module>
+        <module>home-work-8</module>
     </modules>
 
     <packaging>pom</packaging>
