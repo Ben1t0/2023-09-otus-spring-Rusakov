@@ -47,7 +47,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book update(BookCreateDto bookCreateDto) {
         bookRepository.findById(bookCreateDto.id())
-                .orElseThrow(() -> new NotFoundException("Book with id %d not found".formatted(bookCreateDto.id())));
+                .orElseThrow(() -> new NotFoundException("Book with id %s not found".formatted(bookCreateDto.id())));
         return save(bookCreateDto);
     }
 

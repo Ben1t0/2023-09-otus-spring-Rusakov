@@ -6,5 +6,7 @@ import ru.otus.spring.models.Comment;
 import java.util.List;
 
 public interface CommentRepository extends MongoRepository<Comment, String> {
-    List<Comment> findByBookId(String book_id);
+    List<Comment> findByBookId(String bookId);
+
+    void deleteAllByBookId(String bookId);
 }

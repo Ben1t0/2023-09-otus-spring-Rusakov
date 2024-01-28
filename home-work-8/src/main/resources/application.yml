@@ -1,12 +1,29 @@
 spring:
   data:
     mongodb:
-      port: 27017 # 0 when flapdoodle using
+      port: 27017  # 0 when flapdoodle using # 27017
       database: library
       host: localhost
+  shell:
+    interactive:
+      enabled: true
+    noninteractive:
+      enabled: false
 
+    command:
+      version:
+        enabled: false
 de:
   flapdoodle:
     mongodb:
       embedded:
-        version: 4.0.2
+        version: 4.4.16
+
+mongock:
+  #runner-type: "ApplicationRunner" # default
+  runner-type: "InitializingBean"
+  change-logs-scan-package:
+    - ru.otus.spring.mongock.changelog
+  mongo-db:
+    write-concern:
+      journal: false

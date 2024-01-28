@@ -23,12 +23,10 @@ class BookServiceImplTest {
         var book = bookService.create(
                 BookCreateDto.builder()
                         .title("New Book")
-                        .authorId(2L)
-                        .genreIds(Set.of(2L, 6L))
+                        .authorId("2")
+                        .genreIds(Set.of("2", "6"))
                         .build()
         );
-
-        assertThat(book.getId()).isGreaterThan(0);
 
         var response = bookService.findById(book.getId());
 
@@ -40,7 +38,7 @@ class BookServiceImplTest {
                 .hasFieldOrPropertyWithValue("title", "New Book");
 
         assertThat(response.get().getAuthor())
-                .hasFieldOrPropertyWithValue("id", 2L)
+                .hasFieldOrPropertyWithValue("id", "2")
                 .hasFieldOrPropertyWithValue("fullName", "Author_2");
         assertThat(response.get().getGenres()).hasSize(2);//.containsAll(List.of(g2, g6));
         assertThat(bookService.findAll().size()).isEqualTo(countBefore + 1);
@@ -48,14 +46,14 @@ class BookServiceImplTest {
 
     @Test
     void shouldUpdateBook() {
-        var g2 = new Genre(2, "Genre_2");
-        var g6 = new Genre(6, "Genre_6");
+        var g2 = new Genre("2", "Genre_2");
+        var g6 = new Genre("6", "Genre_6");
         var book = bookService.update(
                 BookCreateDto.builder()
-                        .id(3L)
+                        .id("3")
                         .title("New Book")
-                        .authorId(2L)
-                        .genreIds(Set.of(2L, 6L))
+                        .authorId("2")
+                        .genreIds(Set.of("2", "6"))
                         .build()
         );
 
@@ -65,11 +63,11 @@ class BookServiceImplTest {
                 .isPresent()
                 .get()
                 .isNotNull()
-                .hasFieldOrPropertyWithValue("id", 3L)
+                .hasFieldOrPropertyWithValue("id", "3")
                 .hasFieldOrPropertyWithValue("title", "New Book");
 
         assertThat(response.get().getAuthor())
-                .hasFieldOrPropertyWithValue("id", 2L)
+                .hasFieldOrPropertyWithValue("id", "2")
                 .hasFieldOrPropertyWithValue("fullName", "Author_2");
         assertThat(response.get().getGenres()).hasSize(2)
                 .usingRecursiveFieldByFieldElementComparator()

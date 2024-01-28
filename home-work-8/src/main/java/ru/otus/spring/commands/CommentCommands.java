@@ -21,7 +21,7 @@ public class CommentCommands {
         return converter.commentDtoToString(commentService.findById(id));
     }
 
-    @ShellMethod(value = "Find comment by id", key = "cbbid")
+    @ShellMethod(value = "Find comment by book id", key = "cbbid")
     public String findCommentsByBookId(String id) {
         return commentService.findByBookId(id).stream()
                 .map(converter::commentDtoToString)
@@ -40,7 +40,7 @@ public class CommentCommands {
         return converter.commentDtoToString(comment);
     }
 
-    @ShellMethod(value = "Delete book by id", key = "bdel")
+    @ShellMethod(value = "Delete comment by id", key = "cdel")
     public void deleteComment(String id) {
         commentService.deleteById(id);
     }
