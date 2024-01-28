@@ -53,7 +53,7 @@ public class BookController {
                              Model model) {
         if (bindingResult.hasErrors()) {
 
-            return "create_book";
+            return "redirect:/books/create";
         }
 
         bookService.create(book);
@@ -77,7 +77,7 @@ public class BookController {
                            Model model) {
 
         if (bindingResult.hasErrors()) {
-            return "edit_book";
+            return "redirect:/books/edit";
         }
         bookService.update(book);
 

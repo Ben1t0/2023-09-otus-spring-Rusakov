@@ -37,10 +37,18 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
     }
 
     @ExceptionHandler({NotFoundException.class})
-    public ResponseEntity<Object> handleNotFoundException(RuntimeException e) {
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setReason("The required object was not found.");
-        apiError.setMessage(e.getMessage());
+        apiError.setMessage(ex.getMessage());
+        return createResponse(apiError);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> globalExceptionHandler(Exception ex) {
+        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR);
+        apiError.setReason("Internal server error.");
+        apiError.setMessage(ex.getMessage());
         return createResponse(apiError);
     }
 

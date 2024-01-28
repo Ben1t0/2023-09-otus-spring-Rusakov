@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @Getter
 public class BookUpdateDto {
-    @NotEmpty
+    @NotNull
     private Long id;
 
     @Builder.Default
