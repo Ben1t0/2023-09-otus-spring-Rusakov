@@ -5,8 +5,6 @@ import com.github.cloudyrock.mongock.ChangeSet;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import ru.otus.spring.domain.Person;
-import ru.otus.spring.repostory.PersonRepository;
 
 @ChangeLog
 public class DatabaseChangelog {
@@ -22,11 +20,11 @@ public class DatabaseChangelog {
         var doc = new Document().append("name", "Lermontov");
         myCollection.insertOne(doc);
     }
-
+/*
     @ChangeSet(order = "003", id = "insertPushkin", author = "stvort")
     public void insertPushkin(PersonRepository repository) {
         repository.save(new Person("Pushkin"));
-    }
+    }*/
 }
 /*
     merge into authors (full_name)

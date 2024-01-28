@@ -27,7 +27,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Book> findById(long id) {
+    public Optional<Book> findById(String id) {
         return bookRepository.findById(id);
     }
 
@@ -52,14 +52,14 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteById(String id) {
         bookRepository.deleteById(id);
     }
 
     private Book save(BookCreateDto bookCreateDto) {
         var author = authorRepository.findById(bookCreateDto.authorId())
                 .orElseThrow(
-                        () -> new NotFoundException("Author with id %d not found".formatted(bookCreateDto.authorId())));
+                        () -> new NotFoundException("Author with id %s not found".formatted(bookCreateDto.authorId())));
         List<Genre> genres = genreRepository.findAllByIdIn(bookCreateDto.genreIds());
         if (isEmpty(genres) || genres.size() != bookCreateDto.genreIds().size()) {
             throw new NotFoundException("Genres with ids %s not found".formatted(bookCreateDto.genreIds()));

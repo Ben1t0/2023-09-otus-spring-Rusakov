@@ -5,13 +5,13 @@ import ru.otus.spring.dto.CommentDto;
 import java.util.List;
 
 public interface CommentService {
-    CommentDto findById(long id);
+    CommentDto findById(String id);
 
-    List<CommentDto> findByBookId(long id);
+    List<CommentDto> findByBookId(String id);
 
-    CommentDto create(long bookId, String message);
+    CommentDto create(String bookId, String message);
 
-    CommentDto update(long commentId, String message);
+    CommentDto update(String commentId, String message);
 
-    void deleteById(long id);
+    void deleteById(String id);
 }

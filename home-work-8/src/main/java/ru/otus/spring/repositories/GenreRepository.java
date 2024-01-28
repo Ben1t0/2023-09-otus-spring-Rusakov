@@ -7,5 +7,5 @@ import java.util.Collection;
 import java.util.List;
 
 public interface GenreRepository extends MongoRepository<Genre, String> {
-    List<Genre> findAllByIdIn(Collection<Long> ids);
+    List<Genre> findAllByIdIn(Collection<String> id);
 }

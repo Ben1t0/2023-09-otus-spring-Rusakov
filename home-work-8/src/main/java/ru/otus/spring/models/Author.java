@@ -1,9 +1,13 @@
 package ru.otus.spring.models;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collation = "authors")
+@Document(collection = "authors")
+@Getter
+@Setter
 public class Author {
 
     @Id

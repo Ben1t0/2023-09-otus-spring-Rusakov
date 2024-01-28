@@ -23,35 +23,35 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
 
     @Override
-    public CommentDto findById(long id) {
+    public CommentDto findById(String id) {
         return commentRepository.findById(id).map(commentMapper::toDto).orElse(null);
     }
 
     @Override
-    public List<CommentDto> findByBookId(long id) {
+    public List<CommentDto> findByBookId(String id) {
         return commentRepository.findByBookId(id).stream().map(commentMapper::toDto).toList();
     }
 
     @Override
-    public CommentDto create(long bookId, String message) {
+    public CommentDto create(String bookId, String message) {
         Book book = bookRepository.findById(bookId).orElseThrow(
-                () -> new NotFoundException("book with %d not found".formatted(bookId)));
+                () -> new NotFoundException("book with %s not found".formatted(bookId)));
         Comment comment = new Comment(null, message, book);
         return commentMapper.toDto(commentRepository.save(comment));
     }
 
     @Override
-    public CommentDto update(long commentId, String message) {
+    public CommentDto update(String commentId, String message) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new NotFoundException("Comment with %d not found".formatted(commentId)));
+                () -> new NotFoundException("Comment with %s not found".formatted(commentId)));
         comment.setMessage(message);
         return commentMapper.toDto(commentRepository.save(comment));
     }
 
     @Override
-    public void deleteById(long commentId) {
+    public void deleteById(String commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new NotFoundException("Comment with %d not found".formatted(commentId)));
+                () -> new NotFoundException("Comment with %s not found".formatted(commentId)));
         commentRepository.delete(comment);
     }
 }

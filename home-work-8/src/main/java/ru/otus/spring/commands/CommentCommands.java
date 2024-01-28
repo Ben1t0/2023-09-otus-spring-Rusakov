@@ -17,31 +17,31 @@ public class CommentCommands {
     private final CommentConverter converter;
 
     @ShellMethod(value = "Find comment by id", key = "cbid")
-    public String findCommentById(long id) {
+    public String findCommentById(String id) {
         return converter.commentDtoToString(commentService.findById(id));
     }
 
     @ShellMethod(value = "Find comment by id", key = "cbbid")
-    public String findCommentsByBookId(long id) {
+    public String findCommentsByBookId(String id) {
         return commentService.findByBookId(id).stream()
                 .map(converter::commentDtoToString)
                 .collect(Collectors.joining("\n"));
     }
 
     @ShellMethod(value = "Insert comment", key = "cins")
-    public String insertComment(long bookId, String message) {
+    public String insertComment(String bookId, String message) {
         var comment = commentService.create(bookId, message);
         return converter.commentDtoToString(comment);
     }
 
     @ShellMethod(value = "Update comment", key = "cupd")
-    public String updateComment(long commentId, String message) {
+    public String updateComment(String commentId, String message) {
         var comment = commentService.update(commentId, message);
         return converter.commentDtoToString(comment);
     }
 
     @ShellMethod(value = "Delete book by id", key = "bdel")
-    public void deleteComment(long id) {
+    public void deleteComment(String id) {
         commentService.deleteById(id);
     }
 }
