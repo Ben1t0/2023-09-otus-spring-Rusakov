@@ -61,8 +61,6 @@ class MongoBookRepositoryTest extends AbstractRepositoryTest {
                 .containsAll(response);
     }
 
-
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
     void shouldSaveBook() {
         var g4 = genreRepository.findById("4").get();
@@ -93,7 +91,6 @@ class MongoBookRepositoryTest extends AbstractRepositoryTest {
                 .containsAll(genres);
     }
 
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
     void shouldUpdateBook() {
         Genre g3 = new Genre("3", "Genre_3");
@@ -145,7 +142,6 @@ class MongoBookRepositoryTest extends AbstractRepositoryTest {
                 .containsAll(List.of(g3, g4));
     }
 
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
     void shouldDeleteBookById() {
         var response = bookRepository.findById("1");
