@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Edit person</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        h3 {
+            background-image: url("../static/listmark.png");
+            background-repeat: no-repeat;
+            padding: 2px;
+            padding-left: 30px;
+        }
+
+        .errors {
+            color: red;
+        }
+    </style>
+
+    <style type="text/css" th:inline="text">
+        [[h3]]
+        {
+            background-image: url([[@{/listmark.png}]])
+        ;
+            background-repeat: no-repeat
+        ;
+            padding: 2px
+        ;
+            padding-left: 30px
+        ;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Book edition -->
+<form id="edit-form" action="edit_book.html" th:action="@{/books/edit(id=${book.id})}" th:method="post"
+      th:object="${book}">
+    <h3>Book Info:</h3>
+
+    <div class="row">
+        <label for="id-input">ID:</label>
+        <input id="id-input" type="text" readonly="readonly" name="id" th:value="*{id}" value="1"/>
+    </div>
+
+    <div class="row">
+        <label for="book-title-input">Title:</label>
+        <input id="book-title-input" name="title" type="text" th:value="*{title}" value="I, Robot"/>
+        <div class="errors" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Wrong book title error</div>
+    </div>
+
+    <div class="row">
+        <label for="book-author-select">Author:</label>
+        <select id="book-author-select" th:field="*{authorId}">
+            <option th:each="a : ${authorsList}" th:selected="${a.id == book.authorId}" th:value="${a.id}"
+                    th:text="${a.fullName}"/>
+        </select>
+    </div>
+
+    <div class="row">
+        <label for="book-genres-select">Genres:</label>
+        <select id="book-genres-select" th:field="*{genreIds}" multiple="multiple">
+            <option th:each="g : ${genresList}" th:selected="${#lists.contains(book.genreIds, g.id)}" th:value="${g.id}"
+                    th:text="${g.name}"/>
+        </select>
+    </div>
+
+    <div class="row">
+        <button type="submit">Save</button>
+        <a href="list.html" th:href="@{/}">
+            <button type="button">Cancel</button>
+        </a>
+    </div>
+</form>
+
+</body>
+</html>
