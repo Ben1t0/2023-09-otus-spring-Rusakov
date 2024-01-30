@@ -77,7 +77,7 @@ public class BookController {
                            Model model) {
 
         if (bindingResult.hasErrors()) {
-            return "redirect:/books/edit";
+            return "redirect:/books/edit?id=" + book.getId();
         }
         bookService.update(book);
 
