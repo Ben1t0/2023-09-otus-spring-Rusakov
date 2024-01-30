@@ -23,6 +23,7 @@
         <module>home-work-7</module>
         <module>home-work-8</module>
         <module>home-work-9</module>
+        <module>home-work-10</module>
     </modules>
 
     <packaging>pom</packaging>
