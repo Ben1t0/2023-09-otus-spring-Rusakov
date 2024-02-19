@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books {
+            border: 1px solid steelblue;
+            width: 600px;
+            border-collapse: collapse;
+        }
+
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+        function fillTable() {
+            const bookTableBody = document.getElementById("bookTableBody");
+            axios.get('/api/v1/books')
+                .then(result => {
+                    const books = result.data;
+                    books.forEach(book => {
+                        let row = bookTableBody.insertRow();
+                        let id = row.insertCell(0);
+                        id.innerHTML = book.id;
+                        let title = row.insertCell(1);
+                        title.innerHTML = book.title;
+                        let author = row.insertCell(2);
+                        author.innerHTML = book.author.fullName;
+                        let genres = row.insertCell(3);
+                        genres.innerHTML = book.genres.map(g => g.name).join(', ');
+                        let actions = row.insertCell(4);
+                        actions.innerHTML =
+                            `<td>
+                                <a href="/books/edit?id=${book.id}">
+                                    <button type="button">Edit</button>
+                                </a>
+                                <button type="submit" onClick="deleteBook(${book.id})">
+                                    Delete
+                                </button>
+                            </td>`;
+                    });
+                })
+                .catch(err => {
+                    console.log(err.message);
+                })
+        }
+
+        function deleteBook(id) {
+            axios.delete(`/api/v1/books/${id}`)
+                .then(() => {
+                    window.location.replace("/");
+                });
+        }
+    </script>
+</head>
+<body onload="fillTable()">
+
+<h1>All books in our library:</h1>
+
+<a th:href="@{/books/create}" href="create_book.html">Add book</a>
+<br></br>
+<table class="books" id="bookTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genres</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody id="bookTableBody">
+    </tbody>
+</table>
+
+</body>
+</html>
