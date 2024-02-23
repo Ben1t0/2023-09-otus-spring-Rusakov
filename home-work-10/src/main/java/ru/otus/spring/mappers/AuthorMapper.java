@@ -9,4 +9,11 @@ public class AuthorMapper {
     public AuthorDto toDto(Author author) {
         return new AuthorDto(author.getId(), author.getFullName());
     }
+
+    public Author toModel(AuthorDto dto) {
+        return Author.builder()
+                .id(dto.id())
+                .fullName(dto.fullName())
+                .build();
+    }
 }

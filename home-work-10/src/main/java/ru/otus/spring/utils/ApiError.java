@@ -3,7 +3,6 @@ package ru.otus.spring.utils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,23 +16,15 @@ public class ApiError {
 
     private String reason;
 
-    private final HttpStatus status;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timeStamp;
 
-    public ApiError(HttpStatus status) {
-        this.timeStamp = LocalDateTime.now();
-        this.status = status;
-    }
-
-    public ApiError(HttpStatus status, String reason) {
-        this(status);
+    public ApiError(String reason) {
         this.reason = reason;
     }
 
-    public ApiError(HttpStatus status, String message, String reason) {
-        this(status, reason);
+    public ApiError(String message, String reason) {
+        this(reason);
         this.message = message;
     }
 }

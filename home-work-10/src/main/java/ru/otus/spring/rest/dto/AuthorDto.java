@@ -1,4 +1,4 @@
 package ru.otus.spring.rest.dto;
 
-public record AuthorDto(long id, String fullName) {
+public record AuthorDto(Long id, String fullName) {
 }

@@ -1,4 +1,4 @@
 package ru.otus.spring.rest.dto;
 
-public record GenreDto(long id, String name) {
+public record GenreDto(Long id, String name) {
 }

@@ -1,58 +1,58 @@
 package ru.otus.spring.handlers;
 
-import org.springframework.http.HttpHeaders;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.otus.spring.exceptions.NotFoundException;
 import ru.otus.spring.utils.ApiError;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
-@ControllerAdvice
-public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHandler {
+@RestControllerAdvice
+@Slf4j
+public class GlobalControllerExceptionHandler {
 
     /**
      * Handle MethodArgumentNotValidException. Triggered when an object fails @Valid validation.
      */
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status,
-                                                                  WebRequest request) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        ApiError apiError = new ApiError("Incorrectly made request.");
         apiError.setErrors(ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> "Field: " + error.getField() + ". Error: " + error.getDefaultMessage() +
                         ". Value: " + error.getRejectedValue())
                 .collect(Collectors.toList()));
         apiError.setMessage("During [" + ex.getBindingResult().getObjectName() + "] validation " +
                 ex.getBindingResult().getFieldErrors().size() + " errors were found");
-        apiError.setReason("Incorrectly made request.");
-        return createResponse(apiError);
+        return apiError;
     }
 
+
     @ExceptionHandler({NotFoundException.class})
-    public ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
-        apiError.setReason("The required object was not found.");
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleNotFoundException(NotFoundException ex) {
+        ApiError apiError = new ApiError("The required object was not found.");
         apiError.setMessage(ex.getMessage());
-        return createResponse(apiError);
+        return apiError;
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> globalExceptionHandler(Exception ex) {
-        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR);
-        apiError.setReason("Internal server error.");
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError globalExceptionHandler(Exception ex) {
+        String stackTrace = Arrays.stream(ex.getStackTrace())
+                .map(String::valueOf)
+                .collect(Collectors.joining("; "));
+        log.error(stackTrace);
+        ApiError apiError = new ApiError("Internal server error.");
+        apiError.setErrors(new ArrayList<>());
+        apiError.getErrors().add(stackTrace);
         apiError.setMessage(ex.getMessage());
-        return createResponse(apiError);
-    }
-
-    private ResponseEntity<Object> createResponse(ApiError apiError) {
-        return new ResponseEntity<>(apiError, apiError.getStatus());
+        return apiError;
     }
 }
