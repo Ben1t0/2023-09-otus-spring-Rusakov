@@ -7,6 +7,7 @@ import ru.otus.spring.exceptions.NotFoundException;
 import ru.otus.spring.mappers.CommentMapper;
 import ru.otus.spring.models.Book;
 import ru.otus.spring.models.Comment;
+import ru.otus.spring.repositories.BookRepository;
 import ru.otus.spring.repositories.CommentRepository;
 import ru.otus.spring.rest.dto.CommentCreateDto;
 import ru.otus.spring.rest.dto.CommentDto;
@@ -20,7 +21,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    private final BookService bookService;
+    private final BookRepository bookRepository;
 
     private final CommentMapper commentMapper;
 
@@ -38,7 +39,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentDto create(CommentCreateDto commentCreateDto) {
-        Book book = bookService.findByIdOrThrow(commentCreateDto.getBookId());
+        Book book = bookRepository.findById(commentCreateDto.getBookId())
+                .orElseThrow(() -> new NotFoundException("Book not found"));
         Comment comment = commentMapper.toModel(commentCreateDto, book);
         return commentMapper.toDto(commentRepository.save(comment));
     }
@@ -51,8 +53,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private Comment findByIdOrThrow(long id) {
-        return commentRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Comment with %d not found".formatted(id)));
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Comment with %d not found".formatted(id)));
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.otus.spring.exceptions.NotFoundException;
 import ru.otus.spring.mappers.BookMapper;
 import ru.otus.spring.models.Author;
 import ru.otus.spring.models.Book;
@@ -18,6 +19,7 @@ import ru.otus.spring.rest.dto.BookCreateDto;
 import ru.otus.spring.rest.dto.BookDto;
 import ru.otus.spring.rest.dto.BookUpdateDto;
 import ru.otus.spring.services.BookService;
+import ru.otus.spring.utils.ApiError;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -100,7 +102,7 @@ class BookControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(mapper.writeValueAsString(bookDto)));
 
 
@@ -145,8 +147,59 @@ class BookControllerTest {
     @Test
     void shouldDeleteBook() throws Exception {
         mvc.perform(delete("/api/v1/books/{bookId}", 1))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(bookService, times(1)).deleteById(1);
+    }
+
+    @DisplayName("Должен вернуть 404 код с сообщением об ошибке когда книга не найдена")
+    @Test
+    void shouldReturnErrorMessageWhenBookNotFound() throws Exception {
+        String exMessage = "Book not found";
+
+        when(bookService.findById(1001)).thenThrow(new NotFoundException(exMessage));
+
+        ApiError apiError = new ApiError("The required object was not found.");
+        apiError.setMessage(exMessage);
+        mvc.perform(get("/api/v1/books/{bookId}", 1001))
+                .andExpect(status().isNotFound())
+                .andExpect(content().json(mapper.writeValueAsString(apiError)));
+    }
+
+    @DisplayName("Должен вернуть 400 код с сообщением об ошибке когда создаешь книгу с неправильными данными")
+    @Test
+    void shouldReturn400AndErrorMessageWhenBookCreateWrongData() throws Exception {
+        ApiError apiError = new ApiError("Incorrectly made request.");
+        apiError.setMessage("During [bookCreateDto] validation 3 errors were found");
+        apiError.setErrors(List.of("Field: genreIds. Error: must not be empty. Value: null",
+                "Field: authorId. Error: must not be null. Value: null",
+                "Field: title. Error: must not be blank. Value: null"));
+
+        mvc.perform(post("/api/v1/books")
+                        .content("{}")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(mapper.writeValueAsString(apiError)));
+    }
+
+    @DisplayName("Должен вернуть 400 код с сообщением об ошибке когда обновляешь книгу с неправильными данными")
+    @Test
+    void shouldReturn400AndErrorMessageWhenBookUpdateWrongData() throws Exception {
+        ApiError apiError = new ApiError("Incorrectly made request.");
+        apiError.setMessage("During [bookUpdateDto] validation 4 errors were found");
+        apiError.setErrors(List.of("Field: authorId. Error: must not be null. Value: null",
+                "Field: id. Error: must not be null. Value: null",
+                "Field: genreIds. Error: must not be empty. Value: null",
+                "Field: title. Error: must not be blank. Value: null"));
+
+        mvc.perform(put("/api/v1/books")
+                        .content("{}")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(mapper.writeValueAsString(apiError)));
     }
 }

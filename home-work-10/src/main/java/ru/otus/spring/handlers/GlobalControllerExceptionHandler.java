@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.otus.spring.exceptions.NotFoundException;
 import ru.otus.spring.utils.ApiError;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -45,13 +46,14 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError globalExceptionHandler(Exception ex) {
-        String stackTrace = Arrays.stream(ex.getStackTrace())
-                .map(String::valueOf)
-                .collect(Collectors.joining("; "));
-        log.error(stackTrace);
         ApiError apiError = new ApiError("Internal server error.");
         apiError.setErrors(new ArrayList<>());
-        apiError.getErrors().add(stackTrace);
+        StringWriter sw = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(sw)) {
+            ex.printStackTrace(pw);
+            apiError.getErrors().add(sw.toString());
+        }
+        log.error("Error", ex);
         apiError.setMessage(ex.getMessage());
         return apiError;
     }
