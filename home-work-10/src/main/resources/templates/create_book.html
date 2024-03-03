@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Create book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        .errors {
+            color: red;
+        }
+    </style>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+        function onLoad() {
+            const form = document.getElementById("create-form");
+            form.addEventListener('submit', handleSubmit);
+            fillAuthorsSelect();
+            fillGenresSelect();
+        }
+
+        function fillGenresSelect() {
+            let genresSelect = document.getElementById("book-genres-select");
+            axios.get('/api/v1/genres').then(response => {
+                const respData = response.data;
+                console.log(respData);
+                respData.map(genre => {
+                    let opt = document.createElement("option");
+                    opt.value = genre.id;
+                    opt.name = 'genreIds';
+                    opt.innerHTML = genre.name;
+                    genresSelect.append(opt);
+                });
+            }).catch(err => {
+                console.log(err.message);
+            });
+        }
+
+        function fillAuthorsSelect() {
+            let authorsSelect = document.getElementById("book-author-select");
+            axios.get('/api/v1/authors').then(response => {
+                const respData = response.data;
+                console.log(respData);
+                respData.map(author => {
+                    let opt = document.createElement("option");
+                    opt.value = author.id;
+                    opt.innerHTML = author.fullName;
+                    authorsSelect.append(opt);
+                });
+            }).catch(err => {
+                console.log(err.message);
+            });
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            const value = Object.fromEntries(data.entries());
+            const genresSelect = document.getElementById("book-genres-select");
+            const result = [];
+
+            const options = genresSelect && genresSelect.options;
+            let opt;
+            for (let i = 0, iLen = options.length; i < iLen; i++) {
+                opt = options[i];
+                if (opt.selected) {
+                    result.push(opt.value);
+                }
+            }
+            value.genreIds = result;
+            console.log({value});
+            axios.post(`/api/v1/books`, value)
+                .then(() =>
+                    window.location.href = "/")
+                .catch(err => {
+                    console.log(err.message);
+                });
+        }
+    </script>
+</head>
+<body onload="onLoad()">
+
+<!-- Book edition -->
+<form id="create-form">
+    <h3>Add Book:</h3>
+
+    <div class="row">
+        <label for="book-title-input">Title:</label>
+        <input id="book-title-input" name="title" type="text" value="I, Robot"/>
+    </div>
+
+    <div class="row">
+        <label for="book-author-select">Author:</label>
+        <select id="book-author-select" name="authorId">
+        </select>
+    </div>
+
+    <div class="row">
+        <label for="book-genres-select">Genres:</label>
+        <select id="book-genres-select" multiple="multiple">
+        </select>
+    </div>
+
+    <div class="row">
+        <button type="submit">Add</button>
+        <a href="list.html" th:href="@{/}">
+            <button type="button">Cancel</button>
+        </a>
+    </div>
+</form>
+
+</body>
+</html>
